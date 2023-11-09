@@ -1,56 +1,10 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import AdminComponent from "./components/adminComponent";
 
 function App() {
   const [gear, setGear] = useState([]);
-  const [formData, setFormData] = useState({
-    type: "",
-    name: "",
-    size: "",
-    legal: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const newValue = name === "size" ? parseFloat(value) : value;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: newValue,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    };
-
-    fetch("/add", requestOptions)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error("Något gick fel vid POST-förfrågan.");
-      })
-      .then((responseData) => {
-        console.log("Data har skickats till servern:", responseData);
-
-        setFormData({
-          type: "",
-          name: "",
-          size: "",
-          legal: "",
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     fetch("/api")
@@ -60,17 +14,26 @@ function App() {
       });
   }, []);
 
+  const handleClick = () => {
+    setIsAdmin(!isAdmin);
+  };
+
+  const handleDelete = () => {
+    console.log("delete");
+  };
+
   return (
     <>
       <h1>GKK</h1>
-      <h2>Tillgäng utrusning på klubben</h2>
+      <h2>Tillgänglig utrustning på klubben</h2>
+
       <table>
         <thead>
           <tr>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Size</th>
-            <th>Legal</th>
+            <th>Typ</th>
+            <th>Modell</th>
+            <th>Storlek</th>
+            <th>Godkänd</th>
           </tr>
         </thead>
         <tbody>
@@ -80,50 +43,24 @@ function App() {
               <td>{item.name}</td>
               <td>{item.size}</td>
               <td>{item.legal}</td>
+              {isAdmin && (
+                <td>
+                  <img
+                    src="./../public/trash.svg"
+                    alt=""
+                    onClick={handleDelete}
+                  />
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
-      <h2>Lägg till ny utrustning</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Type:</label>
-          <input
-            type="text"
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Namn:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Storlek:</label>
-          <input
-            type="text"
-            name="size"
-            value={formData.size}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Laglig:</label>
-          <input
-            type="text"
-            name="legal"
-            value={formData.legal}
-            onChange={handleChange}
-          />
-        </div>
-        <button type="submit">Skicka</button>
-      </form>
+      <div className="adminContainer">
+        <label htmlFor="admin"> Admin </label>
+        <input type="checkbox" id="admin" onClick={handleClick} />
+        {isAdmin && <AdminComponent />}
+      </div>
     </>
   );
 }

@@ -44,6 +44,19 @@ app.post("/add", async (request, response) => {
   }
 });
 
+app.delete("/delete", async (request, response) => {
+  let sql = "DELETE FROM gear WHERE id =$1";
+  let params = [request.body.id];
+  try {
+    const result = await client.query(sql, params);
+    response.json(result.rows);
+  } catch (error) {
+    return response.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
 app.use(express.static(path.join(path.resolve(), "public")));
 
 app.listen(3000, () => {
