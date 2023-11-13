@@ -35,7 +35,8 @@ app.post("/add", async (request, response) => {
     client.query(sql, params, (error, results, fields) => {
       if (error) throw error;
 
-      response.json(results);
+	response.json(results);
+	console.log("Du har lagt till utrustning")
     });
   } catch (error) {
     return response.status(500).json({
